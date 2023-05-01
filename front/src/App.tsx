@@ -35,6 +35,27 @@ const App = () => {
     });
   };
 
+  const putTodo = async (todo: Todo) => {
+    await axios
+      .put(`${baseURL}/${todo.id}`, {
+        ...todo,
+        completed: !todo.completed,
+      })
+      .then((response) => {
+        setTodos(
+          todos.map((todo) =>
+            todo.id === response.data.id ? response.data : todo
+          )
+        );
+      });
+  };
+
+  const deleteTodo = async (todo: Todo) => {
+    await axios.delete(`${baseURL}/${todo.id}`).then((response) => {
+      setTodos(todos.filter((todo) => todo.id !== response.data.id));
+    });
+  };
+
   const handleChanges = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPostBody({ ...postBody, [e.target.name]: e.target.value });
   };
@@ -61,8 +82,14 @@ const App = () => {
       <ul>
         {todos.map((todo) => (
           <li key={todo.id}>
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => putTodo(todo)}
+            />
             <span style={{ paddingRight: "2rem" }}>{todo.title}</span>
             <span style={{ paddingRight: "2rem" }}>{todo.description}</span>
+            <button onClick={() => deleteTodo(todo)}>delete</button>
           </li>
         ))}
       </ul>
